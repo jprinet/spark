@@ -472,8 +472,9 @@ private[sql] object QueryExecutionErrors extends QueryErrorsBase with ExecutionE
     SparkException.internalError(s"Can not interpolate ${arg.getClass.getName} into code block.")
   }
 
-  def customCollectionClsNotResolvedError(): SparkUnsupportedOperationException = {
-    new SparkUnsupportedOperationException("_LEGACY_ERROR_TEMP_2017")
+  def customCollectionClsNotResolvedError(): SparkException = {
+    SparkException.internalError(
+      "Cannot determine the data type of an unresolved MapObjects without a collection class.")
   }
 
   def classUnsupportedByMapObjectsError(cls: Class[_]): SparkRuntimeException = {
@@ -3626,5 +3627,13 @@ private[sql] object QueryExecutionErrors extends QueryErrorsBase with ExecutionE
       errorClass = "BIN_BY_INVALID_RANGE",
       messageParameters = Map("rangeStart" -> rangeStart, "rangeEnd" -> rangeEnd)
     )
+  }
+
+  def binByOverflowError(): SparkArithmeticException = {
+    new SparkArithmeticException(
+      errorClass = "DATETIME_OVERFLOW",
+      messageParameters = Map("operation" -> "compute BIN BY bucket boundaries"),
+      context = Array.empty,
+      summary = "")
   }
 }
